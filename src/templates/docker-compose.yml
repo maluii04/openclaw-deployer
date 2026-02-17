@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  openclaw-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openclaw-gateway
+    ports:
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+    environment:
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+      - OPENCLAW_CONFIG_NAME=${OPENCLAW_CONFIG_NAME:-openclaw.openai-chat.json}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - XAI_API_KEY=${XAI_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
+      - SLACK_APP_TOKEN=${SLACK_APP_TOKEN:-}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN:-}
+      - WHATSAPP_API_KEY=${WHATSAPP_API_KEY:-}
+    volumes:
+      - openclaw-state:/root/.openclaw
+      - openclaw-workspace:/root/openclaw/workspace
+      - ./configs:/app/configs:ro
+    networks:
+      - openclaw-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  openclaw-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openclaw-cli
+    environment:
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+    volumes:
+      - openclaw-state:/root/.openclaw
+      - openclaw-workspace:/root/openclaw/workspace
+    networks:
+      - openclaw-network
+    profiles:
+      - cli
+    entrypoint: ["openclaw"]
+
+volumes:
+  openclaw-state:
+    driver: local
+  openclaw-workspace:
+    driver: local
+
+networks:
+  openclaw-network:
+    driver: bridge

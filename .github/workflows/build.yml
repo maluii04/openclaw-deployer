@@ -1,0 +1,92 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build-intel:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install Rust
+      uses: dtolnay/rust-action@stable
+      with:
+        targets: x86_64-apple-darwin
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Install Tauri CLI
+      run: cargo install tauri-cli
+      
+    - name: Build Intel Version
+      run: cargo tauri build --target x86_64-apple-darwin
+      
+    - name: Upload Intel DMG
+      uses: actions/upload-artifact@v4
+      with:
+        name: OpenClaw-Deployer-macOS-Intel
+        path: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+
+  build-arm:
+    runs-on: macos-latest-xlarge  # Apple Silicon runner
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install Rust
+      uses: dtolnay/rust-action@stable
+      with:
+        targets: aarch64-apple-darwin
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Install Tauri CLI
+      run: cargo install tauri-cli
+      
+    - name: Build Apple Silicon Version
+      run: cargo tauri build --target aarch64-apple-darwin
+      
+    - name: Upload ARM DMG
+      uses: actions/upload-artifact@v4
+      with:
+        name: OpenClaw-Deployer-macOS-AppleSilicon
+        path: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+
+  release:
+    needs: [build-intel, build-arm]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          **/*.dmg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

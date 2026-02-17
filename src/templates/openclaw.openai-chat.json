@@ -1,0 +1,88 @@
+{
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "{{MODEL_PROVIDER}}/{{MODEL_NAME}}"
+      },
+      "personality": {
+        "name": "OpenClaw Assistant",
+        "style": "helpful, direct, and professional"
+      }
+    }
+  },
+  "models": {
+    "providers": {
+      "anthropic": {
+        "baseUrl": "https://api.anthropic.com/v1",
+        "api": "anthropic-messages",
+        "models": {
+          "claude-opus": "claude-3-opus-20240229",
+          "claude-sonnet": "claude-3-5-sonnet-20241022",
+          "claude-haiku": "claude-3-haiku-20240307"
+        }
+      },
+      "openai": {
+        "baseUrl": "https://api.openai.com/v1",
+        "api": "openai-completions",
+        "models": {
+          "gpt-4o": "gpt-4o",
+          "gpt-4": "gpt-4-turbo-preview",
+          "gpt-3.5": "gpt-3.5-turbo"
+        }
+      },
+      "gemini": {
+        "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+        "api": "gemini-generate",
+        "models": {
+          "gemini-pro": "gemini-1.5-pro",
+          "gemini-flash": "gemini-1.5-flash"
+        }
+      },
+      "xairouter": {
+        "baseUrl": "https://api.xairouter.com/v1",
+        "api": "openai-completions",
+        "models": {
+          "minimax-m2.1": "xairouter/MiniMax-M2.1",
+          "qwen-coder": "xairouter/Qwen3-Coder"
+        }
+      },
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "api": "openai-completions",
+        "models": {
+          "claude-opus": "anthropic/claude-3-opus",
+          "gpt-4o": "openai/gpt-4o",
+          "llama-3": "meta-llama/llama-3-70b-instruct"
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": {{TELEGRAM_ENABLED}},
+      "webhook": false
+    },
+    "discord": {
+      "enabled": {{DISCORD_ENABLED}},
+      "gateway": true
+    },
+    "slack": {
+      "enabled": {{SLACK_ENABLED}},
+      "socket": true
+    },
+    "whatsapp": {
+      "enabled": {{WHATSAPP_ENABLED}}
+    }
+  },
+  "skills": {
+    "enabled": ["web-search", "browser", "code-execution"],
+    "config": {
+      "web-search": {
+        "provider": "brave"
+      },
+      "browser": {
+        "headless": true
+      }
+    }
+  }
+}
