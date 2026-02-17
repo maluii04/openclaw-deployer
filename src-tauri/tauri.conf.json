@@ -1,10 +1,10 @@
 {
   "build": {
-    "beforeBuildCommand": "",
-    "beforeDevCommand": "",
-    "devPath": "../src",
-    "distDir": "../src",
-    "withGlobalTauri": true
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
+    "devPath": "http://localhost:5173",
+    "distDir": "../dist",
+    "withGlobalTauri": false
   },
   "tauri": {
     "allowlist": {
@@ -14,16 +14,7 @@
         "open": true
       },
       "fs": {
-        "all": true,
-        "readFile": true,
-        "writeFile": true,
-        "readDir": true,
-        "copyFile": true,
-        "createDir": true,
-        "removeDir": true,
-        "removeFile": true,
-        "renameFile": true,
-        "exists": true
+        "all": true
       },
       "http": {
         "all": true,
@@ -38,9 +29,7 @@
         "relaunch": true
       },
       "dialog": {
-        "all": true,
-        "open": true,
-        "save": true
+        "all": true
       },
       "notification": {
         "all": true
@@ -65,7 +54,7 @@
         "icons/icon.ico"
       ],
       "identifier": "com.openclaw.deployer",
-      "longDescription": "OpenClaw 一键部署工具 - 桌面版，支持 AI 模型配置、通信渠道设置和 Skills 管理",
+      "longDescription": "OpenClaw 一键部署工具",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -91,21 +80,14 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 900,
+        "height": 850,
         "resizable": true,
         "title": "OpenClaw Deployer",
-        "width": 1400,
-        "minWidth": 1000,
-        "minHeight": 700,
-        "center": true,
-        "decorations": true,
-        "transparent": false
+        "width": 1200,
+        "minWidth": 900,
+        "minHeight": 600,
+        "center": true
       }
-    ],
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true,
-      "menuOnLeftClick": false
-    }
+    ]
   }
 }

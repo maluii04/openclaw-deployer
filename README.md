@@ -1,148 +1,102 @@
-# OpenClaw Deployer - macOS 版
+# OpenClaw Deployer - 一键部署工具
 
-## 📥 下载安装
+真正一键运行的 OpenClaw 部署工具，自动检测并安装依赖。
 
-### 方式一：DMG 安装包（推荐）
+## ✨ 特性
 
-1. 下载 `OpenClaw-Deployer_1.0.0_x64.dmg`
-2. 双击打开 DMG 文件
-3. 将 "OpenClaw Deployer" 拖到 Applications 文件夹
-4. 从启动台或 Applications 文件夹启动
+- 🎯 **一键运行** - 双击即可启动，自动检测环境
+- 🤖 **自动安装** - 缺失的依赖可以一键自动安装
+- 🎨 **精美界面** - 现代化的向导式操作界面
+- 🚀 **快速部署** - 4 步完成 OpenClaw 部署
 
-### 方式二：App 文件
+## 📦 前置要求
 
-1. 下载 `OpenClaw-Deployer.app.tar.gz`
-2. 解压到 Applications 文件夹
-3. 首次运行可能需要右键点击选择"打开"
+| 软件 | 必需 | 说明 |
+|------|------|------|
+| Node.js 18+ | ✅ | 构建时需要 |
+| Rust 1.70+ | ✅ | 构建时需要 |
+| Docker Desktop | ✅ | 运行时必需 |
+| Git | ❌ | 可选 |
 
 ## 🚀 快速开始
 
-### 前置要求
+### 方式一：使用预编译版本（推荐）
 
-在使用前，请确保已安装以下软件：
+1. 下载 `OpenClaw-Deployer.dmg`
+2. 双击挂载，将应用拖到 Applications
+3. 从启动台打开应用
+4. 应用会自动检测环境，如有缺失会提示安装
 
-1. **Docker Desktop for Mac**
-   - Intel Mac: https://desktop.docker.com/mac/main/amd64/Docker.dmg
-   - Apple Silicon Mac (M1/M2/M3): https://desktop.docker.com/mac/main/arm64/Docker.dmg
-   - 或使用 Homebrew: `brew install --cask docker`
-
-2. **Git**（可选，macOS 通常已预装）
-   - 如未安装: `brew install git`
-
-### 验证安装
-
-打开终端，运行以下命令：
+### 方式二：自己构建
 
 ```bash
-# 检查 Docker
-docker --version
+# 1. 确保已安装 Node.js 和 Rust
+node --version  # v18+
+rustc --version  # 1.70+
 
-# 检查 Docker Compose
-docker-compose --version
-# 或
-docker compose version
+# 2. 进入项目目录
+cd openclaw-deployer-easy
 
-# 检查 Git
-git --version
+# 3. 运行构建脚本
+./构建命令
+
+# 4. 获取安装包
+# 位置: src-tauri/target/release/bundle/dmg/OpenClaw-Deployer_1.0.0_x64.dmg
 ```
 
-## 🛠️ 构建说明
+## 🖥️ 使用流程
 
-### 环境要求
+1. **环境检测** - 应用启动时自动检测 Docker 等依赖
+2. **自动安装** - 如有缺失，点击"一键安装"即可
+3. **选择 AI 模型** - 选择 Claude/GPT/Gemini 并输入 API Key
+4. **配置通信渠道** - 选择企业微信/飞书/Telegram 等
+5. **选择 Skills** - 选择需要的功能扩展
+6. **一键部署** - 点击部署，等待完成
 
-- macOS 11.0 (Big Sur) 或更高版本
-- Rust 1.70+ （https://rustup.rs/）
-- Node.js 18+ （https://nodejs.org/ 或使用 `brew install node`）
-- Xcode Command Line Tools: `xcode-select --install`
+## 📁 项目结构
 
-### 构建步骤
+```
+openclaw-deployer-easy/
+├── src/                    # React 前端代码
+│   ├── components/        # 组件
+│   │   ├── SystemCheck.tsx    # 系统检测
+│   │   └── DeployWizard.tsx   # 部署向导
+│   ├── App.tsx           # 主应用
+│   └── main.tsx          # 入口
+├── src-tauri/            # Rust 后端代码
+│   ├── src/main.rs       # 主程序
+│   ├── tauri.conf.json   # Tauri 配置
+│   └── icons/            # 应用图标
+├── package.json          # Node.js 配置
+├── vite.config.ts        # Vite 配置
+├── tsconfig.json         # TypeScript 配置
+└── 构建命令              # 构建脚本
+```
+
+## 🔧 开发
 
 ```bash
-# 1. 进入项目目录
-cd openclaw-deployer-macos
-
-# 2. 安装依赖
+# 安装依赖
 npm install
 
-# 3. 安装 Rust 依赖（首次需要）
-cd src-tauri
-cargo fetch
-cd ..
+# 开发模式
+npm run tauri:dev
 
-# 4. 构建 macOS 版本
-# Intel Mac:
-npm run build:mac
-
-# Apple Silicon Mac (M1/M2/M3):
-npm run build:mac-arm
-
-# 输出位置：
-# src-tauri/target/x86_64-apple-darwin/release/bundle/  (Intel)
-# src-tauri/target/aarch64-apple-darwin/release/bundle/ (Apple Silicon)
+# 构建发布版本
+npm run tauri:build
 ```
 
-### 构建通用二进制（Universal Binary）
+## 🐛 常见问题
 
-同时支持 Intel 和 Apple Silicon：
+### Q: 构建失败
+A: 确保已安装 Node.js 18+ 和 Rust 1.70+
 
-```bash
-# 构建两个版本
-cargo tauri build --target x86_64-apple-darwin
-cargo tauri build --target aarch64-apple-darwin
+### Q: Docker 安装失败
+A: 手动从 https://www.docker.com/products/docker-desktop 下载安装
 
-# 合并为通用二进制
-lipo -create \
-  src-tauri/target/x86_64-apple-darwin/release/OpenClaw-Deployer \
-  src-tauri/target/aarch64-apple-darwin/release/OpenClaw-Deployer \
-  -o src-tauri/target/universal/OpenClaw-Deployer
-```
+### Q: 应用无法打开
+A: macOS 提示"无法验证开发者"时，前往 系统设置 → 隐私与安全性 → 点击"仍要打开"
 
-### 构建输出
+## 📄 许可证
 
-构建完成后，会在以下位置生成安装包：
-
-```
-src-tauri/target/x86_64-apple-darwin/release/bundle/     # Intel Mac
-src-tauri/target/aarch64-apple-darwin/release/bundle/    # Apple Silicon
-├── dmg/                                                  # DMG 安装包
-│   └── OpenClaw-Deployer_1.0.0_x64.dmg
-├── app/                                                  # App 文件
-│   └── OpenClaw-Deployer.app
-└── tar.gz/                                               # 压缩包
-    └── OpenClaw-Deployer.app.tar.gz
-```
-
-## 📝 使用说明
-
-1. **启动应用**：
-   - 从 Applications 文件夹双击打开
-   - 或使用 Spotlight 搜索 "OpenClaw Deployer"
-
-2. **系统托盘**：
-   - 应用最小化后会显示在菜单栏
-   - 点击图标可显示/隐藏窗口
-
-3. **部署 OpenClaw**：
-   - 选择 AI 模型提供商（Claude、GPT、Gemini 等）
-   - 配置通信渠道（企业微信、飞书、Telegram 等）
-   - 选择需要的 Skills
-   - 点击"开始部署"
-
-## 🔧 常见问题
-
-### Q: 提示 "无法打开应用，因为无法验证开发者"
-A: 
-1. 前往 系统设置 → 隐私与安全性
-2. 找到 "OpenClaw Deployer"，点击"仍要打开"
-3. 或使用终端: `xattr -cr /Applications/OpenClaw-Deployer.app`
-
-### Q: 提示 "Docker 未安装"
-A: 请先安装 Docker Desktop 并确保其正在运行
-
-### Q: Apple Silicon Mac 上运行 Intel 版本
-A: 使用 Rosetta 2 自动转译，或下载 Apple Silicon 专用版本
-
-## 📞 技术支持
-
-- GitHub Issues: https://github.com/openclaw/openclaw/issues
-- 文档: https://openclaw.ai/docs
+MIT

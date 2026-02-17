@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# OpenClaw Deployer - Mac 一键构建脚本
+
+cd "$(dirname "$0")"
+
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║         OpenClaw Deployer - 构建脚本                       ║"
+echo "╚════════════════════════════════════════════════════════════╝"
+echo ""
+
+# 检查环境
+echo "📋 检查环境..."
+
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js 未安装"
+    echo "   请从 https://nodejs.org/ 下载安装"
+    exit 1
+fi
+
+if ! command -v rustc &> /dev/null; then
+    echo "❌ Rust 未安装"
+    echo "   请运行: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+    exit 1
+fi
+
+echo "✓ Node.js: $(node --version)"
+echo "✓ Rust: $(rustc --version)"
+echo ""
+
+# 安装依赖
+echo "📦 安装依赖..."
+npm install
+
+# 安装 Tauri CLI（如果没有）
+if ! command -v cargo-tauri &> /dev/null; then
+    echo "📦 安装 Tauri CLI..."
+    cargo install tauri-cli
+fi
+
+echo ""
+echo "🔨 开始构建..."
+echo "   这可能需要 5-10 分钟，请耐心等待"
+echo ""
+
+# 构建
+cargo tauri build
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✅ 构建成功！"
+    echo ""
+    echo "📂 安装包位置:"
+    echo "   src-tauri/target/release/bundle/dmg/"
+    echo ""
+    ls -lh src-tauri/target/release/bundle/dmg/*.dmg 2>/dev/null || echo "   (未找到 DMG 文件)"
+else
+    echo ""
+    echo "❌ 构建失败"
+    exit 1
+fi
