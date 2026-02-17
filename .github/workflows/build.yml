@@ -1,40 +1,57 @@
-name: Build macOS App
+name: Build OpenClaw Deployer
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
-  build:
+  build-macos-intel:
     runs-on: macos-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        
-    - name: Install Rust
-      uses: dtolnay/rust-action@stable
-        
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Install Tauri CLI
-      run: cargo install tauri-cli --locked
-      
-    - name: Build Universal Binary
-      run: cargo tauri build
-      
-    - name: Upload DMG
-      uses: actions/upload-artifact@v4
-      with:
-        name: OpenClaw-Deployer-macOS
-        path: src-tauri/target/release/bundle/dmg/*.dmg
-        retention-days: 7
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          rustup target add x86_64-apple-darwin
+      - run: npm install
+      - run: |
+          source $HOME/.cargo/env
+          cargo install tauri-cli --version 1.5.0
+      - run: |
+          source $HOME/.cargo/env
+          cargo tauri build --target x86_64-apple-darwin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpenClaw-Deployer-macOS-Intel
+          path: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+
+  build-macos-arm:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          rustup target add aarch64-apple-darwin
+      - run: npm install
+      - run: |
+          source $HOME/.cargo/env
+          cargo install tauri-cli --version 1.5.0
+      - run: |
+          source $HOME/.cargo/env
+          cargo tauri build --target aarch64-apple-darwin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpenClaw-Deployer-macOS-AppleSilicon
+          path: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
